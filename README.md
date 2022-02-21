@@ -1,4 +1,4 @@
-# battleshipOnline
+# Battleship Online
 This is the classic Battleship board game, implemented in python using the PyGame library.
 For those who aren't familiar with this game, it is a competitive game for 2 players, fighting themselves
 At the beginning of the game, each player place his/her battleships inside a 10x10 board. The goal is to guess the other player's battleships placement.
