@@ -8,10 +8,10 @@ This repository will include both of the server code and client code. (And of co
 I'm kipping both of the server and client code to communicate in the local machine (localhost), so anyone who wants to clone this project and run it will be able
 to do so without the limitation of a specific real server.
 
-Server deployment:
+# Server deployment:
 The server is planned to be deployed to my virtual machine instance in Oracle's Cloud.
 The database I'm using for this project is SQLite, which also will be held in the cloud with the server code.
 
-Last Notes:
+# Last Notes:
 This project was programmed by me (Din Ezra) for educational purposes only. My goal here is to practice implementing client-server development using TCP sockets, and
 developing a multi-threaded application in python.
