@@ -20,7 +20,7 @@ from .scene import Scene
 
 
 class Board:
-    """ Board's class.
+    """ Board class.
     Each object of this class is a player's board. The board will be 10x10 cells size, printed as a fixed table with
     10 columns and 10 rows. The ships will be drawn over the board. """
 
@@ -69,6 +69,10 @@ class Board:
         if self.isHighlighted:
             self.highlightCell(display, self.getCell(self.mousePos))
 
+    def getCellSize(self):
+        """ Get function for the single cell's size. """
+        return self.cellSize
+
     def getCell(self, mousePos) -> tuple:
         """ Get the cell indices which the user's mouse is pointing at.
 
@@ -98,10 +102,77 @@ class Board:
                       self.rect[1] + cell[1] * self.cellSize[1] + self.borderWidth))
 
 
+class Battleship:
+    """ Battleship class.
+    This class represents the battleships objects. The player will be able to drag and drop the battleship and place it
+    on the board. """
+
+    def __init__(self, startPos: tuple, length: int, cellSize: tuple):
+        """ Initialize the Battleship's object.
+
+        :param startPos:        Starting position of the battleship
+        :param length:          The length of the battleship.
+        :param cellSize:        The single cell's size of the game's board.
+        """
+        self.startPos = startPos
+        self.length = length
+        self.cellSize = cellSize
+        self.img = pygame.transform.scale(pygame.image.load('resources/images/battleship.png'),
+                                          (cellSize[0], length * cellSize[1]))
+        self.isActive = False  # Indicates if the object is active for drag&drop
+        self.btnFlipClicked = False # Used to avoid multiple flips when continuously pressing the button
+        self.isPlaced = False  # Indicates if the object already properly places on the board
+
+        Battleship.currentActive = None # Class attribute, a pointer to the current active battleship
+
+    def update(self):
+        """ Update the battleship.
+        To activate a battleship behaviour, the player needs to press the mouse's left key.
+        To deactivate a battleship behaviour, the player needs to press the mouse's right key.
+        To rotate an activated battleship, the player needs to press the space button.
+        To place an activated battleship on the game's board, the player needs to press the mouse's left key on the
+        desired position on the board. """
+        mouseState = pygame.mouse.get_pressed()
+
+        # Toggle active on when player press on the left button.
+        if mouseState[0] and Battleship.currentActive is None:
+            mousePos = pygame.mouse.get_pos()
+            if self.startPos[0] < mousePos[0] < self.startPos[0] + self.img.get_size()[0] and self.startPos[1] < \
+                    mousePos[1] < self.startPos[1] + self.img.get_size()[1]:
+                self.isActive = True
+                Battleship.currentActive = self
+
+        # Toggle active off when player press on the right button.
+        if mouseState[2]:
+            Battleship.currentActive = None
+            self.isActive = False
+
+        # Flip the battleship.
+        if self.isActive and pygame.key.get_pressed()[pygame.K_SPACE]:
+            if not self.btnFlipClicked:
+                self.img = pygame.transform.rotate(self.img, 90)
+                self.btnFlipClicked = True
+        else:
+            self.btnFlipClicked = False
+
+    def draw(self, display: pygame.Surface):
+        """ Draw the battleship. """
+        if self.isActive:
+            # Object is active. Its position should be the same as the player's mouse's position.
+            mousePos = pygame.mouse.get_pos()
+            objSize = self.img.get_size()
+            display.blit(self.img, (mousePos[0] - objSize[0] / 2, mousePos[1] - objSize[1] / 2))
+        else:
+            # Object is NOT active. Draw it on the starting position.
+            display.blit(self.img, self.startPos)
+
+
 class SceneGame(Scene):
     def __init__(self, display, *args):
         Scene.__init__(self, display, *args)
-        self.board = Board((20, 20, 500, 500))
+        self.board = Board((20, 20, 200, 200))
+        self.battleship1 = Battleship((300, 300), 3, self.board.getCellSize())
+        self.battleship2 = Battleship((500, 300), 5, self.board.getCellSize())
 
     def update(self):
         for event in pygame.event.get():
@@ -109,7 +180,11 @@ class SceneGame(Scene):
                 return False
 
         self.board.update()
+        self.battleship1.update()
+        self.battleship2.update()
 
     def draw(self, display: pygame.Surface):
         display.fill((100, 100, 100))
         self.board.draw(display)
+        self.battleship1.draw(display)
+        self.battleship2.draw(display)
