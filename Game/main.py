@@ -1,4 +1,17 @@
-""" This file is the main python code for the client. All of the initial game's configurations will be defined here. """
+""" This file is the main python code for the client. All of the initial game's configurations will be defined here.
+    This file is in charge of updating and drawing the current scene, navigating between the different scenes and
+    basically call and apply all of the game's functions.
+
+    Run this script if you want to run the game as a client. (To run the server, go to 'server.py' file in 'Server'
+    directory)
+
+    All of the game is programming in python using 'PyGame', 'threading' and 'sockets' libraries.
+    Don't forget to install PyGame using 'pip install pygame' if you want to debug the code. The other libraries are
+    built-in.
+
+    Game was programmed by Din Ezra. You are very welcome to visit my GitHub or LinkedIn pages. :)
+    Thanks for reviewing my code. Any comment or suggestion will be very appreciated.
+"""
 import pygame
 
 import Scenes.scene as scene
@@ -12,16 +25,16 @@ WIN_CAPTION = "Battleship Online - by Din Ezra"
 SCENES = {
     scene.SCENE_GAME: SceneGame
 }
-currentScene = None  # This variable will hold the object of the current scene!
 
 
 def main():
+    """ Main function of the game. """
     def changeScene(newScene="", *args):
         """ Change the current screen to the desired one.
         End the game if newScene='endGame'.
         Do nothing if the desired scene doesn't exist in SCENES's dictionary.
         """
-        global currentScene
+        nonlocal currentScene
         fadeSurface = pygame.Surface(gameDisplay.get_size())
         fadeSurface.fill((0, 0, 0))
 
@@ -42,10 +55,8 @@ def main():
                 gameClock.tick(60)
 
         if newScene == "endGame":
-            # Safely close pygame and quit the game:
+            # Only fade out, to close the game
             fadeOut()
-            pygame.quit()
-            sys.exit()
         elif newScene in SCENES:
             # Fade out and in to the new scene:
             fadeOut()
@@ -67,7 +78,8 @@ def main():
     gameDisplay = pygame.display.set_mode(WIN_SIZE)
     pygame.display.set_caption(WIN_CAPTION)
     gameClock = pygame.time.Clock()
-    currentScene = SCENES[scene.SCENE_GAME](gameDisplay)
+
+    currentScene = SCENES[scene.SCENE_GAME](gameDisplay) # This variable will hold the object of the current scene!
 
     # Game's Loop:
     while update():
@@ -76,6 +88,9 @@ def main():
         pygame.display.update()
 
         gameClock.tick(30)  # 30 FPS
+
+    # Close PyGame safely and quit the game:
+    pygame.quit()
 
 
 if __name__ == '__main__':
